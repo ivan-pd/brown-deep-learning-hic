@@ -1,3 +1,4 @@
+import numpy as np
 import tensorflow as tf
 from keras.layers import ReLU, Conv2D
 
@@ -37,11 +38,28 @@ class HiCPlus(tf.keras.Model):
         return x
 
     def loss_function(self, predictions, targets):
+        # print(predictions.shape)
+        # print(targets.shape)
+
         mse = tf.keras.losses.MeanSquaredError()
        
         return  mse(targets, predictions)
 
-    # def accuracy(self, predictions, targets):
+    def accuracy(self, predictions, targets):
+        
+        # Predictions and targets are (batch_size, 28, 28, 1)
+
+        predictions_flat = tf.reshape(predictions, [self.batch_size, -1])
+        targets_flat = tf.reshape(targets, [self.batch_size, -1])
+
+        coefficents = []
+        for i in range(predictions_flat.shape[0]):
+            x = predictions_flat[i]
+            y = targets_flat[i]
+            r = np.corrcoef(x, y)
+            coefficents.append(r[0][1])
+
+        return np.average(coefficents)
 
 
 
