@@ -1,5 +1,6 @@
 import numpy as np
 import tensorflow as tf
+import scipy as sp
 from keras.layers import ReLU, Conv2D
 
 conv2d1_filters_numbers = 8
@@ -56,8 +57,10 @@ class HiCPlus(tf.keras.Model):
         for i in range(predictions_flat.shape[0]):
             x = predictions_flat[i]
             y = targets_flat[i]
-            r = np.corrcoef(x, y)
-            coefficents.append(r[0][1])
+            r = sp.stats.spearmanr(a=x, b=y)
+            # r = np.corrcoef(x, y)
+            # print(f'{r[0]}')
+            coefficents.append(r[0])
 
         return np.average(coefficents)
 

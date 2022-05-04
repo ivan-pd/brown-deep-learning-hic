@@ -99,6 +99,18 @@ def plot_pearson(data):
     p.set_title('Average Pearson Correlation Per Batch (Targets vs Targets)')
     plt.show()
 
+def plot_spearman(data):
+    
+    x = np.arange(len(data))
+    y = data
+
+    p = sns.lineplot(x, y)
+
+    p.set_xlabel("Batch Number")
+    p.set_ylabel("Spearman Correlation")
+    p.set_title('Average Spearman Correlation Per Batch (Inputs vs Targets)')
+    plt.show()
+
 
 def main():
     # inmodel = args.model
@@ -132,7 +144,7 @@ def main():
     # print(f'Min Corr: {np.min(train_accuracy)}')
 
     print(train_accuracy)
-    plot_pearson(train_accuracy)
+    plot_spearman(train_accuracy)
 
     # test_accuracy = test(model, test_inputs, test_targets)
 
