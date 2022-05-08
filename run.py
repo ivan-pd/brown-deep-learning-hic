@@ -124,17 +124,17 @@ def main():
     train_downsample_16 = './synthetic/c40_s28/16_downsampling/train.npz'
     test_downsample_16 = './synthetic/c40_s28/16_downsampling/test.npz'
 
-    # train_inputs, train_targets, train_inds = get_data(train_downsample_16)
-    # test_inputs, test_targets, test_inds = get_data(test_downsample_16)
+    train_inputs, train_targets, train_inds = get_data(train_downsample_16)
+    test_inputs, test_targets, test_inds = get_data(test_downsample_16)
 
-    train_inputs, train_targets, train_inds = get_data2(train_downsample_16)
-    test_inputs, test_targets, test_inds = get_data2(test_downsample_16)
+    # train_inputs, train_targets, train_inds = get_data2(train_downsample_16)
+    # test_inputs, test_targets, test_inds = get_data2(test_downsample_16)
     
     # print(train_inputs.shape)
     # print(train_targets.shape)
 
     model = HiCPlus()
-    epochs = 1
+    epochs = 10
     train_accuracy = None
     for i in range(epochs):
         print(f'Running Epoch: {i}')
