@@ -1,69 +1,55 @@
-import numpy as np
-import tensorflow as tf
-import scipy as sp
-from keras.layers import ReLU, Conv2D
+#!/usr/bin/env python3
 
-conv2d1_filters_numbers = 8
-conv2d1_filters_size = 9
-conv2d2_filters_numbers = 8
-conv2d2_filters_size = 1
-conv2d3_filters_numbers = 1
-conv2d3_filters_size = 5
+import argparse, sys
+from run import train, test
 
-class HiCPlus(tf.keras.Model):
+def getargs():
+    parser = argparse.ArgumentParser(description='Train CNN model with Hi-C data and make predictions for low resolution HiC data.')
+
+    # Adding Subparsers
+    subparsers = parser.add_subparsers(dest='subcommands')
+
+    # Parser for Training command
+    subtrain = subparsers.add_parser('train',
+            help='''Train CNN model''')
+    subtrain.set_defaults(func=train)
+
+    # Parser for Predicting Command
+    subchrom = subparsers.add_parser('pred_chromosome',
+            help='''predict high resolution interaction frequencies for inter and intra chromosomes''')
+    subchrom.set_defaults(func=test)
+
     
-    def __init__(self):
-        super().__init__()
+    # Adding Arguments for Train
+    subtrain.add_argument('-i', '--inputfile',
+                        help = 'path to a .hic file.', type = str)
+    subtrain.add_argument('-e', '--epochs',
+                        help = 'Number of Epochs to train model',
+                        type = int, default = 10)
+    subtrain.add_argument('-b', '--batch size',
+                        help = 'Batch Size used by model to train',
+                        type = int, default = 250)
 
-        self.batch_size = 250
-        self.opt = tf.keras.optimizers.SGD(learning_rate=0.00001)
+    commands = sys.argv[1:]
+    if ((not commands) or ((commands[0] in ['train', 'pred_chromosome'])
+        and len(commands) == 1)):
+        commands.append('-h')
+    args = parser.parse_args(commands)
 
-        self.conv1 = Conv2D(conv2d1_filters_numbers, conv2d1_filters_size, input_shape=(40,40, 1))
-        self.conv2 = Conv2D(conv2d2_filters_numbers, conv2d2_filters_size)
-        self.conv3 = Conv2D(conv2d3_filters_numbers, conv2d3_filters_size)
-        self.relu = ReLU()
+    return args, commands
 
-    def call(self, inputs):
-        # Convoltion 1
-        x = self.conv1(inputs)
-        x = self.relu(x)
-
-        # Convolution 2
-        x = self.conv2(x)
-        x = self.relu(x)
-
-        # Convolution 3
-        x = self.conv3(x)
-        x = self.relu(x)
-
-        return x
-
-    def loss_function(self, predictions, targets):
-        # print(predictions.shape)
-        # print(targets.shape)
-
-        mse = tf.keras.losses.MeanSquaredError()
-       
-        return  mse(targets, predictions)
-
-    def accuracy(self, predictions, targets):
-        
-        # Predictions and targets are (batch_size, 28, 28, 1)
-
-        predictions_flat = tf.reshape(predictions, [self.batch_size, -1])
-        targets_flat = tf.reshape(targets, [self.batch_size, -1])
-
-        coefficents = []
-        for i in range(predictions_flat.shape[0]):
-            x = predictions_flat[i]
-            y = targets_flat[i]
-            r = sp.stats.spearmanr(a=x, b=y)
-            # r = np.corrcoef(x, y)
-            # print(f'{r[0]}')
-            coefficents.append(r[0])
-
-        return np.average(coefficents)
+# args = parser.parse_args()
+# print(args.accumulate(args.integers))
 
 
+def run():
+    
+    print('Parseing Arguments')
+    args, commands = getargs()
+
+    if commands[0] not in ['-h','--help']:
+        args.func(args)
 
 
+if __name__ == '__main__':
+    run()
